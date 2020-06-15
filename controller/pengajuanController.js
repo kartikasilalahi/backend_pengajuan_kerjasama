@@ -1,4 +1,5 @@
 const { mysql } = require('../connection')
+const { uploader } = require('../helper/uploader')
 
 module.exports = {
     // -------------------------
@@ -19,8 +20,25 @@ module.exports = {
     addPengajuan: (req, res) => {
         try {
             const path = '/mitra/dokumen'
-            const upload = uploader(path, 'doc').fields
+            const uploadMOU = uploader(path, 'docMOU').fields([{ name: 'fileMOU' }])
+            const uploadMOA = uploader(path, 'docMOA').fields([{ name: 'fileMOA' }])
+            const uploadIA = uploader(path, 'docMOA').fields([{ name: 'fileIA' }])
+            const uploadPerpanjangan = uploader(path, 'docMOA').fields([{ name: 'filePerpanjangan' }])
+
+            uploadMOU(req, res, err1 => {
+                if (err1) return res.status(500).json({ message: 'Upload MOU gagal', error: err1.message })
+                uploadMOA(req, res, err2 => {
+                    if (err2) return res.status(500).json({ message: 'Upload MOA gagal', error: err2.message })
+                    uploadIA(req, res, err2 => {
+                        if (err2) return res.status(500).json({ message: 'Upload IA gagal', error: err2.message })
+                        uploadPerpanjangan(req, res, err2 => {
+                            if (err2) return res.status(500).json({ message: 'Upload Perpanjangan gagal', error: err2.message })
+                        })
+                    })
+                })
+            })
         } catch (error) {
+            console.log(error)
 
         }
     }
