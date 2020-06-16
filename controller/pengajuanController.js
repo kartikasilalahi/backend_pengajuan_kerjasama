@@ -56,7 +56,9 @@ module.exports = {
                         MOA='${docs.MOA}', 
                         IA='${docs.IA}', 
                         perpanjangan='${docs.perpanjangan}', 
-                        penanggungjawab='${data.penanggungjawab}'`
+                        penanggungjawab='${data.penanggungjawab}',
+                        bidanglain = '${data.bidanglain}',
+                        idmitra=${data.idmitra}`
 
                 mysql.query(sql, (error, result) => {
                     if (error) return res.status(500).json({ message: "Ada salah query insert pengajuan", error: error.message })
