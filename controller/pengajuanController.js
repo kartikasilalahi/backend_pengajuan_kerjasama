@@ -70,40 +70,7 @@ module.exports = {
             })
         } catch (error) {
             console.log(error)
-
         }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-                // /* -------- MOA ----- */
-                // uploadMOA(req, res, err2 => {
-                //     if (err2) return res.status(500).json({ message: 'Upload MOA gagal', error: err2.message })
-                //     const { fileMOA } = req.files
-                //     const MOA = fileMOA ? pathMOA + '/' + fileMOA[0].filename : null
-
-                //     console.log('in', req.files)
-                //     console.log('moa', MOA)
-
-                //     /* -------- IA ----- */
-                //     uploadIA(req, res, err3 => {
-                //         if (err3) return res.status(500).json({ message: 'Upload IA gagal', error: err3.message })
-                //         const { fileIA } = req.files
-                //         const MIA = fileIA ? path + '/' + fileIA[0].filename : null
-
-                //         /* -------- Perpanjangan ----- */
-                //         uploadPerpanjangan(req, res, err4 => {
-                //             if (err4) return res.status(500).json({ message: 'Upload Perpanjangan gagal', error: err4.message })
-                //             const { filePerpanjangan } = req.files
-                //             const perpanjangan = filePerpanjangan ? path + '/' + filePerpanjangan[0].filename : null
