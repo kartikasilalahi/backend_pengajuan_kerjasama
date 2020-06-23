@@ -58,7 +58,8 @@ module.exports = {
                         perpanjangan='${docs.perpanjangan}', 
                         penanggungjawab='${data.penanggungjawab}',
                         bidanglain = '${data.bidanglain}',
-                        idmitra=${data.idmitra}`
+                        idmitra=${data.idmitra},
+                        status='waiting'`
 
                 mysql.query(sql, (error, result) => {
                     if (error) return res.status(500).json({ message: "Ada salah query insert pengajuan", error: error.message })
@@ -77,8 +78,13 @@ module.exports = {
     // -------------------------
     //       GET AJUA MITRA 
     // -------------------------
-    getAjuan: (req, re) => {
-
+    getAjuan: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT * FROM pengajuan where idmitra = ${id} AND status='waiting'`
+        mysql.query(sql, (err, result) => {
+            if (err) return res.status(500).send(err)
+            return res.status(200).send(result)
+        })
     }
 
 }
