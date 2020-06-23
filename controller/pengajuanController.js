@@ -71,6 +71,14 @@ module.exports = {
         } catch (error) {
             console.log(error)
         }
+    },
+
+
+    // -------------------------
+    //       GET AJUA MITRA 
+    // -------------------------
+    getAjuan: (req, re) => {
+
     }
 
 }
