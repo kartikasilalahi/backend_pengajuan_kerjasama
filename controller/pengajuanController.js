@@ -76,11 +76,22 @@ module.exports = {
 
 
     // -------------------------
-    //       GET AJUA MITRA 
+    //     GET AJUAN MITRA 
     // -------------------------
     getAjuan: (req, res) => {
         let { id } = req.params
-        let sql = `SELECT * FROM pengajuan where idmitra = ${id} AND status='waiting'`
+        let sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id where idmitra = ${id} AND status='waiting'`
+        mysql.query(sql, (err, result) => {
+            if (err) return res.status(500).send(err)
+            return res.status(200).send(result)
+        })
+    },
+
+    // -------------------------
+    //     GET ALL PENGAJUAN
+    // -------------------------
+    getAllNewPengajuan: (req, res) => {
+        let sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id where status='waiting'`
         mysql.query(sql, (err, result) => {
             if (err) return res.status(500).send(err)
             return res.status(200).send(result)
