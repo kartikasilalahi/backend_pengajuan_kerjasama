@@ -96,6 +96,37 @@ module.exports = {
             if (err) return res.status(500).send(err)
             return res.status(200).send(result)
         })
+    },
+
+
+    // ----------------------------
+    //     ACCEPT NEW PENGAJUAN
+    // ----------------------------
+    acceptNewPengajuan: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id where id=${id}`
+        mysql.query(sql, (err, result) => {
+            if (err) return res.status(500).send(err)
+
+            /* --- set status menjadi accept ---- */
+            sql = `UPDATE pengajuan SET status='accept' where id=${id}`
+            mysql.query(sql, (err1, result1) => {
+                if (err1) return res.status(500).send(err1)
+
+                /* --- nge get daftar pengajuan yg waiting --- */
+                sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id where status='waiting'`
+                mysql.query(sql, (err2, result2) => {
+                    if (err2) return res.status(500).send(err2)
+
+                    /* --- nge get daftar pengajuan yg accept --- */
+                    sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id where status='accept'`
+                    mysql.query(sql, (err3, result3) => {
+                        if (err3) return res.status(500).send(err3)
+                        return res.status(200).send({ waiting: result2, accept: result3 })
+                    })
+                })
+            })
+        })
     }
 
 }
