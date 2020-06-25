@@ -7,7 +7,10 @@ router.get('/getbidang', pengajuanController.getBidang)
 router.post('/addpengajuan', pengajuanController.addPengajuan)
 router.get('/getajuan/:id', pengajuanController.getAjuan)
 router.get('/allnewpengajuan', pengajuanController.getAllNewPengajuan)
+router.get('/allaccept', pengajuanController.getAllAccept)
+router.get('/alldecline', pengajuanController.getAllDecline)
 router.put('/accept/:id', pengajuanController.acceptNewPengajuan)
+router.put('/decline/:id', pengajuanController.declineNewPengajuan)
 
 
 module.exports = router
