@@ -16,7 +16,8 @@ module.exports = {
     //     REGISTER 
     // ------------------
     Register: (req, res) => {
-        let { nama, alamat, email, phone, password, confpassword } = req.body
+        let { nama, alamat, email, phone, password, linkperusahaan, jenisperusahaan } = req.body
+        console.log(req.body)
         let sql = `SELECT * FROM akun WHERE email='${email}'`
         mysql.query(sql, (err, result) => {
             if (err) return res.status(500).send({ err })
@@ -32,7 +33,9 @@ module.exports = {
                     phone,
                     alamat,
                     status: 'unverified',
-                    roleid: 2
+                    roleid: 2,
+                    linkperusahaan,
+                    jenisperusahaan
                 }
                 sql = `INSERT INTO akun SET ?`
                 mysql.query(sql, dataAkun, (err2, result2) => {

@@ -121,6 +121,20 @@ module.exports = {
     },
 
 
+    // -----------------------------
+    //     GET Review Penilaian
+    // ------------------------------
+    getReviewPenilaianKerjasama: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT * FROM penilaian WHERE id_pengajuan=${id}`
+        console.log('sql', sql)
+        mysql.query(sql, (err, result) => {
+            if (err) return res.status(500).send(err)
+            return res.status(200).send(result)
+        })
+    },
+
+
     // ----------------------------
     //     ACCEPT NEW PENGAJUAN
     // ----------------------------
