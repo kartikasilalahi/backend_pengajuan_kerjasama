@@ -7,7 +7,7 @@ module.exports = {
     //   SEMUA USER
     // ------------------
     getAllUser: (req, res) => {
-        let sql = `SELECT id,nama,phone,alamat,status,email FROM akun where roleid=2`
+        let sql = `SELECT id,nama,phone,alamat,status,email, jenisperusahaan, linkperusahaan FROM akun where roleid=2`
         mysql.query(sql, (err, result) => {
             if (err) return res.status(500).send(err)
             return res.status(200).send(result)
@@ -19,7 +19,7 @@ module.exports = {
     //  YANG SUDAH VERIFIKASI
     // ------------------------
     userVerified: (req, res) => {
-        let sql = `SELECT id,nama,phone,alamat,status,email FROM akun where roleid=2 AND status='verified'`
+        let sql = `SELECT id,nama,phone,alamat,status,email,jenisperusahaan, linkperusahaan FROM akun where roleid=2 AND status='verified'`
         mysql.query(sql, (err, result) => {
             if (err) return res.status(500).send(err)
             return res.status(200).send(result)
@@ -31,7 +31,7 @@ module.exports = {
     //  YANG BELUM VERIFIKASI
     // ------------------------
     userUnverified: (req, res) => {
-        let sql = `SELECT id,nama,phone,alamat,status,email FROM akun where roleid=2 AND status='unverified'`
+        let sql = `SELECT id,nama,phone,alamat,status,email, jenisperusahaan, linkperusahaan FROM akun where roleid=2 AND status='unverified'`
         mysql.query(sql, (err, result) => {
             if (err) return res.status(500).send(err)
             return res.status(200).send(result)
@@ -59,11 +59,11 @@ module.exports = {
             mysql.query(sql, (err1, result1) => {
                 if (err1) return res.status(500).json({ message: " err di sql verify", error: err1.message })
 
-                sql = `SELECT id,nama,phone,alamat,status,email FROM akun where roleid=2 AND status='unverified'`
+                sql = `SELECT id,nama,phone,alamat,status,email, jenisperusahaan, linkperusahaan FROM akun where roleid=2 AND status='unverified'`
                 mysql.query(sql, (err2, result2) => {
                     if (err2) return res.status(500).send(err2)
 
-                    sql = `SELECT id,nama,phone,alamat,status,email FROM akun where roleid=2 AND status='verified'`
+                    sql = `SELECT id,nama,phone,alamat,status,email, jenisperusahaan, linkperusahaan FROM akun where roleid=2 AND status='verified'`
                     mysql.query(sql, (err3, result3) => {
                         if (err3) return res.status(500).send(err3)
                         return res.status(200).send({ unver: result2, ver: result3 })

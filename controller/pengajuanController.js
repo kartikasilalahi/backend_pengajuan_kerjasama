@@ -87,6 +87,20 @@ module.exports = {
         })
     },
 
+
+    // -------------------------
+    //     GET AJUAN MITRA 
+    // -------------------------
+    getOnprocessMitra: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang where idmitra = ${id} AND status='accept'`
+        mysql.query(sql, (err, result) => {
+            if (err) return res.status(500).send(err)
+            return res.status(200).send(result)
+        })
+    },
+
+
     // -------------------------
     //     GET ALL PENGAJUAN
     // -------------------------
