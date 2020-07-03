@@ -1,8 +1,5 @@
 const cryptogenerate = require('../helper/encrypt')
 const { mysql } = require('../connection')
-// const fs = require('fs')
-// const transporter = require('../helper/mailer')
-// const { createJWTToken } = require('./../helper/jwt')
 
 module.exports = {
 
@@ -23,7 +20,7 @@ module.exports = {
             if (err) return res.status(500).send({ err })
 
             if (result.length > 0) {
-                return res.status(200).send({ status: 'REGISTER_ERROR', message: 'Email sudah terdaftar' })
+                return res.status(200).send({ status: 'REGISTER_ERROR', message: 'Email Sudah Terdaftar' })
             } else {
                 let hashpassword = cryptogenerate(password)
                 let dataAkun = {
@@ -41,7 +38,7 @@ module.exports = {
                 mysql.query(sql, dataAkun, (err2, result2) => {
                     if (err2) return res.status(500).send({ err2 })
 
-                    return res.status(200).send({ status: 'REGISTER_SUCCESS', message: 'Berhasil Registrasi, Dimohon menunggu hingga Administrator melakukan verifikasi akun Anda. Terimkasih' })
+                    return res.status(200).send({ status: 'REGISTER_SUCCESS', message: 'Berhasil Registrasi. Mohon Menunggu Hingga Admin Memverifikasi Akun Anda.' })
                 })
                 // '
             }
@@ -56,7 +53,11 @@ module.exports = {
         let { id } = req.params
         let { email, password } = req.query
 
-        if (email || password) {
+        if (password === '' || email === '') {
+            res.status(200).send({ status: "LOGIN_ERROR", message: "Pastikan Semua Form Terisi" })
+
+        }
+        else if (email || password) {
             let hashpassword = cryptogenerate(password)
             console.log('1')
             let sql = `SELECT * FROM akun WHERE email='${email}' AND password='${hashpassword}'`
@@ -81,7 +82,7 @@ module.exports = {
                 }
                 else {
                     console.log('incorect')
-                    res.status(200).send({ status: "LOGIN_ERROR", message: "Email atau password anda salah atau belum terdaftar" })
+                    res.status(200).send({ status: "LOGIN_ERROR", message: "Email atau Password Anda Salah atau Belum Terdaftar" })
                 }
             })
         } else {
@@ -98,11 +99,102 @@ module.exports = {
                 })
             } else {
                 console.log('masih kosong nihhh')
-                res.status(200).send({ status: "LOGIN_ERROR", message: "Pastikan semua terisi" })
+                res.status(200).send({ status: "LOGIN_ERROR", message: "Pastikan Semua Form Terisi" })
             }
         }
-    }
+    },
 
+
+    // ---------------------
+    //       GET PROFIL
+    // ---------------------
+    GetProfil: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT nama, phone, alamat, email, linkperusahaan, jenisperusahaan FROM akun WHERE id='${id}'`
+        mysql.query(sql, (err1, result1) => {
+            if (err1) res.status(500).send(err1)
+            res.status(200).send(result1)
+        })
+    },
+
+    // ---------------------
+    //       EDIT PROFIL
+    // ---------------------
+    EditProfil: (req, res) => {
+        let { id } = req.params
+        let { nama } = req.body
+        let sql = `SELECT * FROM akun WHERE nama='${nama}'`
+        mysql.query(sql, (err1, result1) => {
+            if (err1) return res.status(500).send(err)
+            if (result1.length > 0 && result1[0].id !== id) {
+                return res.status(200).send({ status: 'editproferr', message: 'Maaf Nama Sudah Terdaftar' })
+            }
+
+            sql = `UPDATE akun SET ? WHERE id=${id}`
+            console.log(req.body)
+            mysql.query(sql, req.body, (err2, result2) => {
+                console.log('4');
+                if (err2) return res.status(500).send({ message: err2, pesa: 'errr' })
+
+                return res.status(200).send(result2)
+            })
+        })
+    },
+
+    // ---------------------
+    //       UBAH PROFIL
+    // ---------------------
+    UbahEmail: (req, res) => {
+        let { id } = req.params
+        let { email } = req.body
+        console.log(req.body)
+        let sql = `SELECT * FROM akun WHERE email='${email}'`
+        mysql.query(sql, (err1, result1) => {
+            if (err1) return res.status(500).send(err)
+            // if (err1) throw err1
+            if (result1.length > 0 && result1[0].id !== id) {
+                return res.status(200).send({ status: 'editemailferr', message: 'Maaf Email Sudah Terdaftar' })
+            }
+
+            sql = `UPDATE akun SET email='${email}' WHERE id=${id}`
+            console.log('sql', sql)
+            mysql.query(sql, (err2, result2) => {
+                if (err2) throw err2
+                // if (err2) return res.status(500).send({ message: err2, pesa: 'errr' })
+                return res.status(200).send(result2)
+            })
+        })
+    },
+
+
+    // ---------------------
+    //    UBAH PASSWORD
+    // ---------------------
+    editPassword: (req, res) => {
+        let { id } = req.params
+        let { password, newpassword } = req.body
+        console.log(req.body)
+        let hashpassword = cryptogenerate(password)
+        console.log(hashpassword)
+        let sql = `SELECT * FROM akun WHERE id=${id}`
+        mysql.query(sql, (err, result) => {
+            if (err) return res.status(500).send(err)
+            console.log('1');
+
+            if (hashpassword == result[0].password) {
+
+                let hassnewpass = cryptogenerate(newpassword)
+                sql = `UPDATE akun SET password='${hassnewpass}' WHERE id=${id}`
+                mysql.query(sql, (err2, result2) => {
+                    if (err2) return res.status(500).send(err2)
+                    return res.status(200).send({ msg: '' })
+                })
+            } else {
+                console.log('slah pass')
+                return res.status(200).send({ msg: "Password Saat Ini Salah!" })
+            }
+        })
+    }
 }
 
 
