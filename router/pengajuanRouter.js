@@ -15,6 +15,7 @@ router.put('/decline/:id', pengajuanController.declineNewPengajuan)
 router.get('/getreviewpenilaian/:id', pengajuanController.getReviewPenilaianKerjasama)
 router.post('/addevaluasi', pengajuanController.addEvaluasi)
 router.get('/gethistory/:id', pengajuanController.getHistory)
+router.get('/getallhistory', pengajuanController.getAllHistory)
 
 
 module.exports = router

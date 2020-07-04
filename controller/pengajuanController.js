@@ -331,6 +331,19 @@ module.exports = {
 
             return res.status(200).send(result)
         })
+    },
+
+
+    // ----------------------------
+    //    GET ALL HISTORY
+    // ----------------------------
+    getAllHistory: (req, res) => {
+        let sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang where status='finish' OR status ='decline'`
+        mysql.query(sql, (err, result) => {
+            if (err) res.status(500).json({ message: 'salah selct history', err: err.message })
+            return res.status(200).send(result)
+        })
     }
+
 
 }
