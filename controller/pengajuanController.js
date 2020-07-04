@@ -237,7 +237,7 @@ module.exports = {
                 console.log(2)
 
                 /* --- nge get daftar pengajuan yg waiting --- */
-                sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang WHERE status='waiting'`
+                sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang WHERE status='waiting '`
                 mysql.query(sql, (err2, result2) => {
                     if (err2) return res.status(500).json({ message: "Ada salah query select waiting", err2: err2.message })
 
@@ -263,6 +263,73 @@ module.exports = {
                     })
                 })
             })
+        })
+    },
+
+
+    // ----------------------------
+    //        ADD EVALUASI
+    // ----------------------------
+    addEvaluasi: (req, res) => {
+        console.log('body', req.body);
+
+        let sql = `INSERT INTO evaluasi SET ?`
+        mysql.query(sql, req.body, (err, result) => {
+            if (err) return res.status(500).json({ message: "Ada salah query insert evaluasi", err: err.message })
+            console.log('1a');
+
+            sql = `UPDATE pengajuan SET status='finish' where id=${req.body.id_pengajuan}`
+            mysql.query(sql, (err1, result1) => {
+                if (err1) return res.status(500).json({ message: "Ada salah query update status", err1: err1.message })
+                console.log('2');
+
+                sql = `SELECT * FROM evaluasi WHERE id_instansi=${req.body.id_instansi}`
+                mysql.query(sql, (err2, result2) => {
+                    if (err2) return res.status(500).json({ message: "Ada salah query select evaluasi", err2: err2.message })
+                    console.log('3');
+
+                    // return res.status(200).send({ })
+
+                    sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang WHERE status='waiting' AND idmitra = ${req.body.id_instansi} `
+                    mysql.query(sql, (err3, result3) => {
+                        if (err3) return res.status(500).json({ message: "Ada salah query select waiting", err3: err2.message })
+
+                        console.log('4')
+
+                        /* --- nge get daftar pengajuan yg decline --- */
+                        sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang WHERE status='accept' AND idmitra = ${req.body.id_instansi} `
+                        mysql.query(sql, (err4, result4) => {
+                            if (err4) return res.status(500).json({ message: "Ada salah query select accept", err4: err3.message })
+
+                            console.log(5)
+
+
+                            /* --- nge get all penilaian --- */
+                            sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang WHERE status='finish' AND idmitra = ${req.body.id_instansi} `;
+                            mysql.query(sql, (err5, result5) => {
+                                if (err5) return res.status(500).json({ message: "Ada salah query select finish", err5: err5.message })
+                                console.log(6)
+
+                                // console.log('decline', result3)
+                                return res.status(200).send({ evaluasi: result2, waiting: result3, accept: result4, finish: result5 })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    },
+
+    // ----------------------------
+    //       GET HISTORY
+    // ----------------------------
+    getHistory: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang where (status='finish' OR status ='decline' )AND idmitra=${id}`
+        mysql.query(sql, (err, result) => {
+            if (err) res.status(500).json({ message: 'salah selct history', err: err.message })
+
+            return res.status(200).send(result)
         })
     }
 

@@ -121,7 +121,7 @@ module.exports = {
     //       EDIT PROFIL
     // ---------------------
     EditProfil: (req, res) => {
-        let { id } = req.params
+        let id = Number(req.params.id)
         let { nama } = req.body
         let sql = `SELECT * FROM akun WHERE nama='${nama}'`
         mysql.query(sql, (err1, result1) => {
@@ -145,15 +145,17 @@ module.exports = {
     //       UBAH PROFIL
     // ---------------------
     UbahEmail: (req, res) => {
-        let { id } = req.params
+        let id = Number(req.params.id)
         let { email } = req.body
         console.log(req.body)
         let sql = `SELECT * FROM akun WHERE email='${email}'`
         mysql.query(sql, (err1, result1) => {
             if (err1) return res.status(500).send(err)
-            // if (err1) throw err1
+
             if (result1.length > 0 && result1[0].id !== id) {
-                return res.status(200).send({ status: 'editemailferr', message: 'Maaf Email Sudah Terdaftar' })
+                return res.status(200).send({ status: 'error', message: 'Maaf Email Sudah Terdaftar' })
+            } else if (result1.length > 0 && result1[0].id === id) {
+                return res.status(200).send({ status: 'warning', message: 'Login Masih Menggunakan Email yang Lama' })
             }
 
             sql = `UPDATE akun SET email='${email}' WHERE id=${id}`
