@@ -343,6 +343,19 @@ module.exports = {
             if (err) res.status(500).json({ message: 'salah selct history', err: err.message })
             return res.status(200).send(result)
         })
+    },
+
+
+    // ----------------------------
+    //       GET EVALUASI
+    // ----------------------------
+    getEvaluasi: (req, res) => {
+        let { id } = req.params
+        let sql = `SELECT * FROM evaluasi WHERE id_pengajuan=${id}`
+        mysql.query(sql, (err, result) => {
+            if (err) res.status(500).json({ message: 'salah selct evaluasi', err: err.message })
+            return res.status(200).send(result)
+        })
     }
 
 
