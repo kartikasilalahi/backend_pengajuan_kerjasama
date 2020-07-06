@@ -61,10 +61,11 @@ module.exports = {
             let hashpassword = cryptogenerate(password)
             console.log('1')
             let sql = `SELECT * FROM akun WHERE email='${email}' AND password='${hashpassword}'`
+            console.log(sql)
             mysql.query(sql, (err, result) => {
                 if (err) res.status(500).send({ disini: err })
-
-                if (result[0] !== undefined) {
+                console.log(result)
+                if (result !== undefined) {
                     if (result[0].status === 'verified') {
                         console.log('diver', result[0].id)
 
