@@ -65,7 +65,13 @@ module.exports = {
             mysql.query(sql, (err, result) => {
                 if (err) res.status(500).send({ disini: err })
                 console.log(result)
-                if (result !== undefined) {
+                if (result.length === 0 || result === undefined || result === []) {
+                    console.log('incorect')
+                    res.status(200).send({ status: "LOGIN_ERROR", message: "Email atau Password Anda Salah atau Belum Terdaftar" })
+                }
+                else if (result.length !== 0 || result !== undefined) {
+                    console.log('stat', result.length);
+
                     if (result[0].status === 'verified') {
                         console.log('diver', result[0].id)
 
@@ -81,10 +87,10 @@ module.exports = {
                         res.status(200).send({ status: "LOGIN_ERROR", message: "Akun anda belum terverifikasi Administrator." })
                     }
                 }
-                else {
-                    console.log('incorect')
-                    res.status(200).send({ status: "LOGIN_ERROR", message: "Email atau Password Anda Salah atau Belum Terdaftar" })
-                }
+                // else {
+                //     console.log('incorect')
+                //     res.status(200).send({ status: "LOGIN_ERROR", message: "Email atau Password Anda Salah atau Belum Terdaftar" })
+                // }
             })
         } else {
             if (id) {

@@ -1,5 +1,7 @@
 const { mysql } = require('../connection')
 const { uploader } = require('../helper/uploader')
+const transporter = require('../helper/mailer')
+
 
 module.exports = {
     // -------------------------
@@ -154,6 +156,8 @@ module.exports = {
     // ----------------------------
     acceptNewPengajuan: (req, res) => {
         let { id } = req.params
+        id = parseInt(id)
+
         /* --- set status menjadi accept ---- */
         let sql = `UPDATE pengajuan SET status='accept' where id=${id}`
         mysql.query(sql, (err, result) => {
@@ -175,28 +179,52 @@ module.exports = {
             mysql.query(sql, (err1, result1) => {
                 if (err1) return res.status(500).json({ message: "Ada salah query insert penilaian", err1: err1.message })
 
-                console.log(2)
+
+                /* -------------- NOTIF KE EMAIL -------------- */
+                sql = `SELECT idmitra FROM pengajuan WHERE id=${id}`
+                mysql.query(sql, (err_id, result_id) => {
+                    if (err_id) return res.status(500).json({ message: "Ada salah query insert penilaian", err_id: err_id.message })
+
+                    sql = `SELECT email from akun where id = ${result_id[0].idmitra}`
+                    mysql.query(sql, (err_mail, result_mail) => {
+                        if (err_mail) return res.status(500).json({ message: "Ada salah query insert penilaian", err_mail: err_mail.message })
+
+                        console.log('email', result_mail[0].email);
+                        let mailoptions = {
+                            from: 'Administrator PK-UMB <buildwithmeh@gmail.com>',
+                            to: result_mail[0].email,
+                            subject: `Notifikasi Terima/Tolak Kerjasama - Pengajuan Kerjasama UMB (PK-UMB)`,
+                            html:
+                                `<h3>Pengajuan Kerjasama Universitas Mercubuana </h3> 
+                                <p style="color:grey;font-size:18px; font-weight:bold">
+                                Terima Kasih telah melakukan Pendaftaran / Pengajuan Kerjasama dengan Universitas Mercubuana di <span style="color:blue;"> Layanan Pengajuan Kerjasama UMB</span><br/>
+                            </p>
+                            <div style="font-size:14px;">
+                                <p>Pengajuan  Kerjasama telah Kami terima dan Kami setujui. Saat ini Pihak kerjasama Instansi Anda dan Universitas Mercubuana sedang berlangsung hingga waktu kesepakatan bersama yang ditentukan. Selamat bekerjasama. Terimkasih</p>
+                            </div>`
+                        }
+                        transporter.sendMail(mailoptions, (err_email, result_email) => {
+                            if (err_email) return res.status(500).send({ message: err_email })
+                            return res.status(200).send({ message: 'berhasil kirim', result_email })
+                        })
+                    })
+                })
+                /* -------------- NOTIF KE EMAIL -------------- */
 
                 /* --- nge get daftar pengajuan yg waiting --- */
                 sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang where status='waiting'`
                 mysql.query(sql, (err2, result2) => {
                     if (err2) return res.status(500).json({ message: "Ada salah query select waiting", err2: err2.message })
 
-                    console.log(3)
-
                     /* --- nge get daftar pengajuan yg accept --- */
                     sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang where status='accept'`
                     mysql.query(sql, (err3, result3) => {
                         if (err3) return res.status(500).json({ message: "Ada salah query select accept", err3: err3.message })
 
-                        console.log(4)
-
-
                         /* --- nge get all penilaian --- */
                         sql = `SELECT * FROM penilaian `;
                         mysql.query(sql, (err4, result4) => {
                             if (err4) return res.status(500).json({ message: "Ada salah query select * penilaian", err4: err4.message })
-                            console.log(5)
 
                             return res.status(200).send({ waiting: result2, accept: result3, penilaian: result4 })
                         })
@@ -212,14 +240,12 @@ module.exports = {
     // ----------------------------
     declineNewPengajuan: (req, res) => {
         let { id } = req.params
+        id = parseInt(id)
+
         /* --- set status menjadi decline ---- */
         let sql = `UPDATE pengajuan SET status='decline' where id=${id}`
         mysql.query(sql, (err, result) => {
             if (err) return res.status(500).send(err)
-            console.log(1)
-
-            console.log(sql)
-
 
             /* --- insert di table penilaian ---- */
             let dataPenilaian = req.body
@@ -234,7 +260,36 @@ module.exports = {
             mysql.query(sql, (err1, result1) => {
                 if (err1) return res.status(500).json({ message: "Ada salah query insert penilaian", err1: err1.message })
 
-                console.log(2)
+                /* -------------- NOTIF KE EMAIL -------------- */
+                sql = `SELECT idmitra FROM pengajuan WHERE id=${id}`
+                mysql.query(sql, (err_id, result_id) => {
+                    if (err_id) return res.status(500).json({ message: "Ada salah query insert penilaian", err_id: err_id.message })
+
+                    sql = `SELECT email from akun where id = ${result_id[0].idmitra}`
+                    mysql.query(sql, (err_mail, result_mail) => {
+                        if (err_mail) return res.status(500).json({ message: "Ada salah query insert penilaian", err_mail: err_mail.message })
+
+                        console.log('email', result_mail[0].email);
+                        let mailoptions = {
+                            from: 'Administrator PK-UMB <buildwithmeh@gmail.com>',
+                            to: result_mail[0].email,
+                            subject: `Notifikasi Terima/Tolak Kerjasama - Pengajuan Kerjasama UMB (PK-UMB)`,
+                            html:
+                                `<h3>Pengajuan Kerjasama Universitas Mercubuana </h3> 
+                                    <p style="color:grey;font-size:18px; font-weight:bold">
+                                    Terima Kasih telah melakukan Pendaftaran / Pengajuan Kerjasama dengan Universitas Mercubuana di <span style="color:blue;"> Layanan Pengajuan Kerjasama UMB</span><br/>
+                                </p>
+                                <div style="font-size:14px;">
+                                    <p>Pengajuan Kerjasama telah Kami terima dan Kami baca. Saat ini Pihak Universitas Mercubuana belum dapat bekerjasama dengan Pihak Instansi Anda dikarenakan beberapa alasan dan pertimbangan. Mungkin Pihak UMB dapat bekerjasama dengan Instansi Anda dilain kesempatan. Mohon maaf atas ketidaknyamanannya, kami ucapkan Terimkasih</p>
+                                </div>`
+                        }
+                        transporter.sendMail(mailoptions, (err_email, result_email) => {
+                            if (err_email) return res.status(500).send({ message: err_email })
+                            return res.status(200).send({ message: 'berhasil kirim', result_email })
+                        })
+                    })
+                })
+                /* -------------- NOTIF KE EMAIL -------------- */
 
                 /* --- nge get daftar pengajuan yg waiting --- */
                 sql = `SELECT * FROM pengajuan p JOIN bidang_kerjasama b ON p.idbidang = b.id_bidang WHERE status='waiting '`
